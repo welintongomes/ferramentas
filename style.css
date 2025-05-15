@@ -1,0 +1,434 @@
+:root {
+    --primary: #3498db;
+    --secondary: #2980b9;
+    --dark: #34495e;
+    --light: #ecf0f1;
+    --success: #2ecc71;
+    --danger: #e74c3c;
+    --warning: #f39c12;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+header {
+    background-color: var(--primary);
+    color: white;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    margin-bottom: 0.5rem;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.search-bar {
+    display: flex;
+    margin-bottom: 1rem;
+    gap: 0.5rem;
+}
+
+.search-bar input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.search-bar button {
+    padding: 0.75rem 1.5rem;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+}
+
+.search-bar button:hover {
+    background-color: var(--secondary);
+}
+
+.main-content {
+    display: flex;
+    gap: 1rem;
+}
+
+.tools-list {
+    flex: 1;
+    background-color: white;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.tools-list h2 {
+    margin-bottom: 1rem;
+    color: var(--dark);
+    border-bottom: 2px solid var(--light);
+    padding-bottom: 0.5rem;
+}
+
+.tool-item {
+    padding: 0.75rem;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-left: 4px solid transparent;
+}
+
+.tool-item:hover {
+    background-color: #f5f7fa;
+    border-left-color: var(--primary);
+}
+
+.tool-item.active {
+    background-color: #e3f2fd;
+    border-left-color: var(--primary);
+}
+
+.tool-display {
+    flex: 2;
+    background-color: white;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+}
+
+.tool-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--light);
+}
+
+.tool-content {
+    flex: 1;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    overflow: auto;
+}
+
+.tool-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--secondary);
+}
+
+.btn-success {
+    background-color: var(--success);
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #27ae60;
+}
+
+.btn-danger {
+    background-color: var(--danger);
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c0392b;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.form-group textarea {
+    height: 200px;
+    font-family: monospace;
+    resize: vertical;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 800px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--light);
+}
+
+.modal-header h2 {
+    color: var(--dark);
+}
+
+.close-btn {
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #777;
+}
+
+.tabs {
+    display: flex;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #ddd;
+}
+
+.tab {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+}
+
+.tab.active {
+    border-bottom-color: var(--primary);
+    color: var(--primary);
+    font-weight: bold;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.welcome-message {
+    text-align: center;
+    padding: 2rem;
+}
+
+.welcome-message h2 {
+    margin-bottom: 1rem;
+    color: var(--dark);
+}
+
+.welcome-message p {
+    margin-bottom: 1.5rem;
+    color: #666;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: #777;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #ddd;
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        flex-direction: column;
+    }
+
+    .tool-display {
+        min-height: 400px;
+    }
+}
+
+/* Estilos para o modo tela cheia */
+.fullscreen-mode .tools-list {
+    display: none;
+}
+
+.fullscreen-mode .tool-display {
+    flex: 1;
+    max-width: 100%;
+}
+
+/* Estilos para melhorar a responsividade */
+@media (max-width: 768px) {
+    .search-bar {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .search-bar input {
+        flex: 1 0 100%;
+        order: 1;
+    }
+
+    .search-bar button {
+        flex: 1 0 auto;
+    }
+
+    #search-btn {
+        order: 2;
+    }
+
+    #add-tool-btn {
+        order: 3;
+    }
+
+    #export-btn,
+    #import-btn {
+        flex: 1 0 calc(50% - 0.5rem);
+        order: 4;
+    }
+
+    .main-content {
+        flex-direction: column;
+    }
+
+    .tool-display {
+        min-height: 70vh;
+    }
+
+    .tool-content {
+        height: 60vh;
+    }
+
+    .tool-actions {
+        flex-wrap: wrap;
+        gap: 0.25rem;
+    }
+
+    .tool-actions button {
+        flex: 1;
+    }
+}
+/* Estilos para o modo tela cheia */
+.fullscreen-active {
+  overflow: hidden;
+}
+
+.fullscreen-mode {
+  position: relative;
+}
+
+/* Animação para o botão de sair */
+#exit-fullscreen {
+  transition: transform 0.2s, background 0.2s;
+}
+
+#exit-fullscreen:hover {
+  transform: scale(1.1);
+  background: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Garantir que o iframe ocupe todo o espaço disponível */
+.fullscreen-active #tool-content iframe {
+  width: 100vw !important;
+  height: 100vh !important;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+}
+.tool-header {
+    display: flex; /* Para alinhar os itens (título e botões) verticalmente */
+    flex-direction: column; /* Coloca os itens em coluna */
+    gap: 10px; /* Adiciona um espaço entre o título e os botões (opcional) */
+    padding: 10px; /* Adiciona um preenchimento interno (opcional) */
+    border-bottom: 1px solid #eee; /* Adiciona uma linha divisória (opcional) */
+}
+
+.tool-actions {
+    display: flex; /* Para alinhar os botões horizontalmente */
+    gap: 5px; /* Adiciona um espaço entre os botões (opcional) */
+    justify-content: flex-end; /* Alinha os botões à direita (opcional) */
+}
+
+#tool-title {
+    margin: 0; /* Remove a margem padrão do h2 (opcional) */
+}
+.respad {
+    width: 100%; /* Ocupa toda a largura */
+    height: 50px; /* Define a altura */
+    /* ou */
+    /* padding: 10px 20px;  Aumenta a altura com preenchimento */
+    box-sizing: border-box; /* Garante que o padding não aumente o tamanho total */
+}
+h2{
+    text-align: center;
+}
+#input-code {
+  overflow-y: auto; /* Garante a rolagem vertical (já deve estar assim) */
+  overflow-x: auto; /* Adiciona a rolagem horizontal quando necessário */
+  white-space: pre; /* Evita quebras de linha automáticas, forçando a rolagem horizontal */
+}
