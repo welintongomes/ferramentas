@@ -432,7 +432,7 @@ h1 {
 .respad {
     width: 80%;
     /* Ocupa toda a largura */
-    height: 25px;
+    height: 18px;
     /* Define a altura */
     /* ou */
     /* padding: 10px 20px;  Aumenta a altura com preenchimento */
@@ -479,7 +479,8 @@ h2 {
 
 @media (max-width: 768px) {
     .pesquis {
-        width: 175px;
+        height: 23px;
+        width: 205px;
     }
 
     #tools-container {
