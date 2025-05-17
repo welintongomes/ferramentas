@@ -1,4 +1,4 @@
-// Classe para gerenciar as ferramentas
+
 class ToolsManager {
     // 1. Adicione este método à classe ToolsManager para detectar duplo clique/toque
     handleDoubleClick() {
@@ -1107,28 +1107,43 @@ class ToolsManager {
     }
 
     // Configura a funcionalidade de busca
-    setupSearchFunctionality() {
-        const searchInput = document.getElementById('search-input');
-        const searchBtn = document.getElementById('search-btn');
+setupSearchFunctionality() {
+    const searchInput = document.getElementById('search-input');
+    const searchBtn = document.getElementById('search-btn');
+    const clearBtn = document.getElementById('clear-search-btn');
 
-        // Busca ao clicar no botão
-        searchBtn.addEventListener('click', () => {
+    // Busca ao clicar no botão
+    searchBtn.addEventListener('click', () => {
+        this.searchTools(searchInput.value);
+    });
+
+    // Busca ao pressionar Enter
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
             this.searchTools(searchInput.value);
-        });
+        }
+    });
 
-        // Busca ao pressionar Enter
-        searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                this.searchTools(searchInput.value);
-            }
-        });
+    // Busca em tempo real ao digitar
+    searchInput.addEventListener('input', () => {
+        const value = searchInput.value;
+        this.searchTools(value);
 
-        // Busca em tempo real ao digitar
-        searchInput.addEventListener('input', () => {
-            this.searchTools(searchInput.value);
-        });
-    }
+        // Mostrar ou ocultar o botão de limpar
+        clearBtn.style.display = value.trim() !== '' ? 'inline-block' : 'none';
+    });
+
+    // Limpar o campo de busca
+    clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        clearBtn.style.display = 'none';
+        searchInput.focus();
+        this.searchTools(''); // Executa busca com string vazia
+    });
 }
+
+}
+
 
 // Inicializa o gerenciador de ferramentas quando a página carregar
 document.addEventListener('DOMContentLoaded', () => {

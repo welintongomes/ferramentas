@@ -12,61 +12,62 @@
 
 <body>
     <header>
-        <h1>Hub de Ferramentas HTML</h1>
+        <h1>Ferramentas HTML</h1>
 
     </header>
-    <div class="container">
-        <div class="search-bar">
-            <input type="text" id="search-input" placeholder="Pesquisar ferramentas...">
-            <button id="search-btn">Buscar</button>
-            <!-- Adicione estes botões após o botão de pesquisa na barra de pesquisa -->
-            <!-- Dentro da div class="search-bar" -->
-            <button id="export-btn" class="btn btn-primary">Exportar </button>
-            <button id="import-btn" class="btn btn-primary">Importar </button>
-            <button id="add-tool-btn" class="btn btn-success">Nova</button>
+    <div class="acoes">
+        <button id="export-btn" class="btn btn-primary">Exportar</button>
+        <button id="import-btn" class="btn btn-primary">Importar</button>
+        <button id="add-tool-btn" class="btn btn-success">Nova</button>
+    </div>
 
 
-        </div>
-
-        <div class="main-content">
-            <div class="tools-list" id="tools-list">
-                <h2>Ferramentas Disponíveis</h2>
-                <div class="tool-header">
-                    <h2 id="tool-title">Título da Ferramenta</h2>
-                    <div class="tool-actions">
-                        <button id="edit-tool-btn" class="btn btn-primary tool-control-btn">Editar</button>
-                        <button id="delete-tool-btn" class="btn btn-danger tool-control-btn">Excluir</button>
-                        <button id="fullscreen-btn" class="btn btn-primary tool-control-btn">Tela Cheia</button>
-                    </div>
-                </div>
+    <div class="main-content">
+        <div class="tools-list" id="tools-list">
+            <h2>Ferramentas Disponíveis</h2>
+            <div class="acoes">
                 <button class="respad" id="reset-defaults-btn">Restaurar Ferramentas Padrões</button>
-                <div id="tools-container">
-                    <!-- Lista de ferramentas será preenchida dinamicamente -->
-                    <div class="empty-state" id="empty-tools">
-                        <p>Nenhuma ferramenta encontrada</p>
-                        <p>Clique em "Nova Ferramenta" para começar</p>
-                    </div>
-                </div>
+                <input class="pesquis" type="text" id="search-input" placeholder="Pesquisar ferramentas...">
+                <button id="search-btn">Buscar</button>
+                <button id="clear-search-btn" title="Limpar pesquisa" style="display: none;">Limpar</button>
             </div>
 
-            <div class="tool-display" id="tool-display">
-                <div class="welcome-message" id="welcome-message">
-                    <h2>Bem-vindo ao Hub de Ferramentas HTML</h2>
-                    <p>Este é seu espaço para criar e acessar ferramentas HTML personalizadas.</p>
-                    <p>Comece adicionando uma nova ferramenta ou selecionando uma existente.</p>
-                    <button id="welcome-add-btn" class="btn btn-primary">Criar Minha Primeira Ferramenta</button>
-                </div>
 
-                <div id="tool-view" style="display: none; height: 100%;">
-
-                    <div class="tool-content" id="tool-content">
-                        <!-- Conteúdo da ferramenta será renderizado aqui -->
-                    </div>
+            <div id="tools-container">
+                <!-- Lista de ferramentas será preenchida dinamicamente -->
+                <div class="empty-state" id="empty-tools">
+                    <p>Nenhuma ferramenta encontrada</p>
+                    <p>Clique em "Nova Ferramenta" para começar</p>
                 </div>
             </div>
         </div>
-        <!-- Adicione este input file oculto para o importador -->
-        <input type="file" id="import-file" accept=".json" style="display: none;">
+
+        <div class="tool-display" id="tool-display">
+            <div class="tool-header">
+                <h2 id="tool-title">Título da Ferramenta</h2>
+            </div>
+            <div class="tool-actions">
+                <button id="edit-tool-btn" class="btn btn-primary tool-control-btn">Editar</button>
+                <button id="delete-tool-btn" class="btn btn-danger tool-control-btn">Excluir</button>
+                <button id="fullscreen-btn" class="btn btn-primary tool-control-btn">Tela Cheia</button>
+            </div>
+            <div class="welcome-message" id="welcome-message">
+                <h2>Bem-vindo ao Hub de Ferramentas HTML</h2>
+                <p>Este é seu espaço para criar e acessar ferramentas HTML personalizadas.</p>
+                <p>Comece adicionando uma nova ferramenta ou selecionando uma existente.</p>
+                <button id="welcome-add-btn" class="btn btn-primary">Criar Minha Primeira Ferramenta</button>
+            </div>
+
+            <div id="tool-view" style="display: none; height: 100%;">
+
+                <div class="tool-content" id="tool-content">
+                    <!-- Conteúdo da ferramenta será renderizado aqui -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Adicione este input file oculto para o importador -->
+    <input type="file" id="import-file" accept=".json" style="display: none;">
     </div>
 
     <!-- Modal para adicionar/editar ferramentas -->

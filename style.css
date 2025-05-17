@@ -81,7 +81,7 @@ h1 {
     padding: 1rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     max-height: 600px;
-    overflow-y: auto;
+    /* overflow-y: auto; */
 }
 
 .tools-list h2 {
@@ -372,63 +372,124 @@ h1 {
         flex: 1;
     }
 }
+
 /* Estilos para o modo tela cheia */
 .fullscreen-active {
-  overflow: hidden;
+    overflow: hidden;
 }
 
 .fullscreen-mode {
-  position: relative;
+    position: relative;
 }
 
 /* Animação para o botão de sair */
 #exit-fullscreen {
-  transition: transform 0.2s, background 0.2s;
+    transition: transform 0.2s, background 0.2s;
 }
 
 #exit-fullscreen:hover {
-  transform: scale(1.1);
-  background: rgba(0, 0, 0, 0.7) !important;
+    transform: scale(1.1);
+    background: rgba(0, 0, 0, 0.7) !important;
 }
 
 /* Garantir que o iframe ocupe todo o espaço disponível */
 .fullscreen-active #tool-content iframe {
-  width: 100vw !important;
-  height: 100vh !important;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 999;
+    width: 100vw !important;
+    height: 100vh !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999;
 }
+
 .tool-header {
-    display: flex; /* Para alinhar os itens (título e botões) verticalmente */
-    flex-direction: column; /* Coloca os itens em coluna */
-    gap: 10px; /* Adiciona um espaço entre o título e os botões (opcional) */
-    padding: 10px; /* Adiciona um preenchimento interno (opcional) */
-    border-bottom: 1px solid #eee; /* Adiciona uma linha divisória (opcional) */
+    display: flex;
+    /* Para alinhar os itens (título e botões) verticalmente */
+    flex-direction: column;
+    /* Coloca os itens em coluna */
+    gap: 10px;
+    /* Adiciona um espaço entre o título e os botões (opcional) */
+    padding: 0px;
+    /* Adiciona um preenchimento interno (opcional) */
+    border-bottom: 1px solid #eee;
+    /* Adiciona uma linha divisória (opcional) */
 }
 
 .tool-actions {
-    display: flex; /* Para alinhar os botões horizontalmente */
-    gap: 5px; /* Adiciona um espaço entre os botões (opcional) */
-    justify-content: flex-end; /* Alinha os botões à direita (opcional) */
+    display: flex;
+    /* Para alinhar os botões horizontalmente */
+    gap: 5px;
+    /* Adiciona um espaço entre os botões (opcional) */
+    justify-content: flex-end;
+    /* Alinha os botões à direita (opcional) */
 }
 
 #tool-title {
-    margin: 0; /* Remove a margem padrão do h2 (opcional) */
+    margin: 0;
+    /* Remove a margem padrão do h2 (opcional) */
 }
+
 .respad {
-    width: 100%; /* Ocupa toda a largura */
-    height: 50px; /* Define a altura */
+    width: 80%;
+    /* Ocupa toda a largura */
+    height: 25px;
+    /* Define a altura */
     /* ou */
     /* padding: 10px 20px;  Aumenta a altura com preenchimento */
-    box-sizing: border-box; /* Garante que o padding não aumente o tamanho total */
+    box-sizing: border-box;
+    /* Garante que o padding não aumente o tamanho total */
 }
-h2{
+
+h2 {
     text-align: center;
 }
+
 #input-code {
-  overflow-y: auto; /* Garante a rolagem vertical (já deve estar assim) */
-  overflow-x: auto; /* Adiciona a rolagem horizontal quando necessário */
-  white-space: pre; /* Evita quebras de linha automáticas, forçando a rolagem horizontal */
+    overflow-y: auto;
+    /* Garante a rolagem vertical (já deve estar assim) */
+    overflow-x: auto;
+    /* Adiciona a rolagem horizontal quando necessário */
+    white-space: pre;
+    /* Evita quebras de linha automáticas, forçando a rolagem horizontal */
+}
+
+#tools-container {
+    max-height: 245px;
+    /* ou ajuste conforme seu layout */
+    overflow-y: auto;
+    padding: 1rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/*deixar botoes de açoes responsivos*/
+
+.acoes {
+    text-align: center;
+    margin: 2px;
+}
+
+@media (min-width: 768px) {
+    .acoes {
+        text-align: center;
+    }
+}
+
+
+@media (max-width: 768px) {
+    .pesquis {
+        width: 175px;
+    }
+
+    #tools-container {
+        margin-right: 34px;
+        margin-left: 34px;
+        max-height: 125px;
+        overflow-y: auto;
+        padding: 1rem;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
 }
