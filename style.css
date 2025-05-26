@@ -338,6 +338,7 @@ h1 {
     }
 
     #search-btn {
+        display: none;
         order: 2;
     }
 
@@ -420,7 +421,7 @@ h1 {
     /* Para alinhar os botões horizontalmente */
     gap: 5px;
     /* Adiciona um espaço entre os botões (opcional) */
-    justify-content: flex-end;
+    justify-content: center;
     /* Alinha os botões à direita (opcional) */
 }
 
@@ -465,13 +466,13 @@ h2 {
 
 /*deixar botoes de açoes responsivos*/
 
-.acoes {
+.importarexportar {
     text-align: center;
     margin: 2px;
 }
 
 @media (min-width: 768px) {
-    .acoes {
+    .importarexportar {
         text-align: center;
     }
 }
@@ -493,4 +494,74 @@ h2 {
         border-radius: 8px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
+}
+
+.acoes {
+    flex-direction: column;
+    align-items: stretch;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    padding: 10px;
+    background-color: #f9f9f9;
+}
+
+.btn {
+    padding: 10px 16px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+.input-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.input {
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    flex: 1;
+    min-width: 200px;
+}
+
+.btn-clear {
+    background-color: #dc3545;
+}
+
+.btn-clear:hover {
+    background-color: #a71d2a;
+}
+
+/* Responsivo para telas menores */
+@media (max-width: 600px) {
+    .acoes {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+
+}
+
+#search-btn {
+    display: none;
+
+}
+
+.importarexportar {
+    flex-direction: column;
+    align-items: stretch;
 }

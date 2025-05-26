@@ -1,4 +1,102 @@
 
+// Serviço de IndexedDB para armazenamento de ferramentas
+class ToolsDBService {
+    constructor() {
+        this.dbName = 'toolsDB';
+        this.storeName = 'tools';
+        this.version = 1;
+        this.db = null;
+    }
+
+    // Inicializa o banco de dados
+    async initDB() {
+        return new Promise((resolve, reject) => {
+            if (this.db) {
+                resolve(this.db);
+                return;
+            }
+
+            const request = indexedDB.open(this.dbName, this.version);
+
+            request.onerror = (event) => {
+                console.error('Erro ao abrir o banco de dados:', event.target.error);
+                reject(event.target.error);
+            };
+
+            request.onsuccess = (event) => {
+                this.db = event.target.result;
+                resolve(this.db);
+            };
+
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains(this.storeName)) {
+                    db.createObjectStore(this.storeName, { keyPath: 'id' });
+                }
+            };
+        });
+    }
+
+    // Salva todas as ferramentas
+    async saveTools(tools) {
+        await this.initDB();
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction([this.storeName], 'readwrite');
+            const store = transaction.objectStore(this.storeName);
+
+            // Limpa o armazenamento atual
+            const clearRequest = store.clear();
+
+            clearRequest.onsuccess = () => {
+                // Adiciona todas as ferramentas
+                let count = 0;
+                tools.forEach(tool => {
+                    const request = store.add(tool);
+                    request.onsuccess = () => {
+                        count++;
+                        if (count === tools.length) {
+                            resolve(true);
+                        }
+                    };
+                    request.onerror = (event) => {
+                        console.error('Erro ao salvar ferramenta:', event.target.error);
+                        reject(event.target.error);
+                    };
+                });
+
+                // Se não houver ferramentas para adicionar
+                if (tools.length === 0) {
+                    resolve(true);
+                }
+            };
+
+            clearRequest.onerror = (event) => {
+                console.error('Erro ao limpar armazenamento:', event.target.error);
+                reject(event.target.error);
+            };
+        });
+    }
+
+    // Carrega todas as ferramentas
+    async loadTools() {
+
+        await this.initDB();
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction([this.storeName], 'readonly');
+            const store = transaction.objectStore(this.storeName);
+            const request = store.getAll();
+
+            request.onsuccess = (event) => {
+                resolve(event.target.result);
+            };
+
+            request.onerror = (event) => {
+                console.error('Erro ao carregar ferramentas:', event.target.error);
+                reject(event.target.error);
+            };
+        });
+    }
+}
 class ToolsManager {
     // 1. Adicione este método à classe ToolsManager para detectar duplo clique/toque
     handleDoubleClick() {
@@ -26,194 +124,26 @@ class ToolsManager {
         }
     }
     // Método para resetar para as ferramentas padrão
-    resetToDefaultTools() {
-        if (confirm('Isso irá substituir todas as suas ferramentas pelas ferramentas padrão. Deseja continuar?')) {
-            const defaultTools = this.getDefaultTools();
-            this.tools = [...defaultTools];
-            this.saveTools();
-            this.renderToolsList();
+    async resetToDefaultTools() {
+    if (confirm('Isso irá substituir todas as suas ferramentas pelas ferramentas padrão. Deseja continuar?')) {
+        const defaultTools = this.getDefaultTools();
+        this.tools = [...defaultTools];
+        await this.saveTools();
+        this.renderToolsList();
 
-            // Reset da ferramenta atual
-            this.currentToolId = null;
-            document.getElementById('welcome-message').style.display = 'block';
-            document.getElementById('tool-view').style.display = 'none';
-            this.updateToolControlsVisibility();
+        // Reset da ferramenta atual
+        this.currentToolId = null;
+        document.getElementById('welcome-message').style.display = 'block';
+        document.getElementById('tool-view').style.display = 'none';
+        this.updateToolControlsVisibility();
 
-            alert('Ferramentas redefinidas para o padrão com sucesso!');
-        }
+        alert('Ferramentas redefinidas para o padrão com sucesso!');
     }
+}
     // Adicione este método à classe ToolsManager
     getDefaultTools() {
         // Retorna um array com ferramentas predefinidas
         return [
-            {
-                id: 'default-notes',
-                title: 'Bloco de Notas',
-                code: `<!DOCTYPE html>
-<html>
-<head>
-    <title>Bloco de Notas</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-        .controls {
-            margin-bottom: 15px;
-            display: flex;
-            gap: 10px;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 14px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        textarea {
-            width: 100%;
-            height: 100%;
-            padding: 15px;
-            box-sizing: border-box;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            resize: none;
-            font-size: 16px;
-            line-height: 1.5;
-            flex-grow: 1;
-        }
-        .status {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #666;
-        }
-    </style>
-</head>
-<body>
-    <h1>Bloco de Notas</h1>
-    
-    <div class="controls">
-        <button onclick="saveNote()">Salvar</button>
-        <button onclick="clearNote()">Limpar</button>
-        <button onclick="downloadNote()">Baixar</button>
-    </div>
-    
-    <textarea id="notepad" placeholder="Digite seu texto aqui..."></textarea>
-    
-    <div class="status">
-        <span id="character-count">0 caracteres</span> | 
-        <span id="word-count">0 palavras</span> |
-        <span id="auto-save-status">Autosalvo há 0s</span>
-    </div>
-
-    <script>
-        const notepad = document.getElementById('notepad');
-        const characterCount = document.getElementById('character-count');
-        const wordCount = document.getElementById('word-count');
-        const autoSaveStatus = document.getElementById('auto-save-status');
-        
-        let lastSaved = Date.now();
-        let autoSaveInterval;
-        
-        // Carrega nota salva quando a página carregar
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedNote = localStorage.getItem('savedNote');
-            if (savedNote) {
-                notepad.value = savedNote;
-                updateCounts();
-            }
-            
-            // Configura autosave a cada 5 segundos
-            autoSaveInterval = setInterval(() => {
-                if (notepad.value.length > 0) {
-                    saveNote(true);
-                }
-                updateAutoSaveStatus();
-            }, 5000);
-        });
-        
-        // Atualiza contadores quando texto muda
-        notepad.addEventListener('input', updateCounts);
-        
-        function updateCounts() {
-            // Conta caracteres
-            const text = notepad.value;
-            characterCount.textContent = text.length + ' caracteres';
-            
-            // Conta palavras
-            const words = text.trim() === '' ? 0 : text.trim().split(/\\s+/).length;
-            wordCount.textContent = words + ' palavras';
-        }
-        
-        function updateAutoSaveStatus() {
-            const secondsAgo = Math.floor((Date.now() - lastSaved) / 1000);
-            autoSaveStatus.textContent = 'Autosalvo há ' + secondsAgo + 's';
-        }
-        
-        function saveNote(isAuto = false) {
-            localStorage.setItem('savedNote', notepad.value);
-            lastSaved = Date.now();
-            
-            if (!isAuto) {
-                autoSaveStatus.textContent = 'Salvo manualmente';
-                setTimeout(updateAutoSaveStatus, 2000);
-            }
-        }
-        
-        function clearNote() {
-            if (confirm('Tem certeza que deseja limpar todas as notas?')) {
-                notepad.value = '';
-                updateCounts();
-            }
-        }
-        
-        function downloadNote() {
-            if (notepad.value.trim() === '') {
-                alert('O bloco de notas está vazio!');
-                return;
-            }
-            
-            const blob = new Blob([notepad.value], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'minhas_notas_' + new Date().toISOString().split('T')[0] + '.txt';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-    </script>
-</body>
-</html>`,
-                createdAt: new Date().toISOString()
-            },
-
-            // ADICIONE NOVAS FERRAMENTAS AQUI, seguindo o mesmo formato:
-            {
-                "id": "Master-calc",
-                "title": "MasterCalc",
-                "code": "<!DOCTYPE html>\n<html>\n<head>\n    <title>Calculadora Avançada</title>\n    <style>\n        body {\n            font-family: Arial, sans-serif;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            height: 100vh;\n            margin: 0;\n            background-color: #f5f5f5;\n        }\n        .app-container {\n            background-color: #fff;\n            border-radius: 10px;\n            box-shadow: 0 2px 10px rgba(0,0,0,0.1);\n            padding: 20px;\n            width: 320px;\n        }\n        .tabs {\n            display: flex;\n            margin-bottom: 15px;\n        }\n        .tab {\n            flex: 1;\n            text-align: center;\n            padding: 10px;\n            background-color: #e0e0e0;\n            cursor: pointer;\n            border-radius: 5px 5px 0 0;\n        }\n        .tab.active {\n            background-color: #4caf50;\n            color: white;\n        }\n        .tab-content {\n            display: none;\n        }\n        .tab-content.active {\n            display: block;\n        }\n        .display {\n            background-color: #f0f0f0;\n            border-radius: 5px;\n            padding: 10px;\n            margin-bottom: 15px;\n            text-align: right;\n            font-size: 24px;\n            height: 40px;\n            overflow: hidden;\n        }\n        .buttons {\n            display: grid;\n            grid-template-columns: repeat(4, 1fr);\n            gap: 10px;\n        }\n        button {\n            background-color: #e0e0e0;\n            border: none;\n            border-radius: 5px;\n            padding: 15px;\n            font-size: 18px;\n            cursor: pointer;\n            transition: background-color 0.2s;\n        }\n        button:hover {\n            background-color: #d0d0d0;\n        }\n        .operator {\n            background-color: #f8a51b;\n            color: white;\n        }\n        .operator:hover {\n            background-color: #e59400;\n        }\n        .equals {\n            background-color: #4caf50;\n            color: white;\n        }\n        .equals:hover {\n            background-color: #3d8c40;\n        }\n        .clear {\n            background-color: #f44336;\n            color: white;\n        }\n        .clear:hover {\n            background-color: #d32f2f;\n        }\n        .converter-container {\n            margin-top: 15px;\n        }\n        .converter-row {\n            display: flex;\n            justify-content: space-between;\n            margin-bottom: 10px;\n        }\n        .converter-group {\n            flex: 1;\n            margin-right: 10px;\n        }\n        .converter-group:last-child {\n            margin-right: 0;\n        }\n        select, input {\n            width: 100%;\n            padding: 8px;\n            border: 1px solid #ddd;\n            border-radius: 5px;\n            margin-top: 5px;\n            box-sizing: border-box;\n        }\n        .converter-label {\n            font-size: 14px;\n            color: #555;\n            margin-bottom: 5px;\n        }\n        .converter-type-select {\n            margin-bottom: 15px;\n            width: 100%;\n            padding: 10px;\n            border-radius: 5px;\n            border: 1px solid #ddd;\n        }\n    </style>\n</head>\n<body>\n    <div class=\"app-container\">\n        <div class=\"tabs\">\n            <div class=\"tab active\" onclick=\"switchTab('calculator')\">Calculadora</div>\n            <div class=\"tab\" onclick=\"switchTab('converter')\">Conversor</div>\n        </div>\n        \n        <div id=\"calculator\" class=\"tab-content active\">\n            <div class=\"display\" id=\"display\">0</div>\n            <div class=\"buttons\">\n                <button class=\"clear\" onclick=\"clearDisplay()\">C</button>\n                <button onclick=\"appendCharacter('(')\">(</button>\n                <button onclick=\"appendCharacter(')')\">)</button>\n                <button class=\"operator\" onclick=\"appendCharacter('/')\">/</button>\n                \n                <button onclick=\"appendCharacter('7')\">7</button>\n                <button onclick=\"appendCharacter('8')\">8</button>\n                <button onclick=\"appendCharacter('9')\">9</button>\n                <button class=\"operator\" onclick=\"appendCharacter('*')\">×</button>\n                \n                <button onclick=\"appendCharacter('4')\">4</button>\n                <button onclick=\"appendCharacter('5')\">5</button>\n                <button onclick=\"appendCharacter('6')\">6</button>\n                <button class=\"operator\" onclick=\"appendCharacter('-')\">-</button>\n                \n                <button onclick=\"appendCharacter('1')\">1</button>\n                <button onclick=\"appendCharacter('2')\">2</button>\n                <button onclick=\"appendCharacter('3')\">3</button>\n                <button class=\"operator\" onclick=\"appendCharacter('+')\">+</button>\n                \n                <button onclick=\"appendCharacter('0')\">0</button>\n                <button onclick=\"appendCharacter('.')\">.</button>\n                <button onclick=\"calculatePercentage()\">%</button>\n                <button class=\"equals\" onclick=\"calculate()\">=</button>\n            </div>\n        </div>\n        \n        <div id=\"converter\" class=\"tab-content\">\n            <select id=\"converterType\" class=\"converter-type-select\" onchange=\"switchConverter()\">\n                <option value=\"currency\">Conversor de Moeda</option>\n                <option value=\"length\">Conversor de Comprimento</option>\n                <option value=\"weight\">Conversor de Peso</option>\n                <option value=\"temperature\">Conversor de Temperatura</option>\n            </select>\n            \n            <div id=\"currencyConverter\" class=\"converter-container\">\n                <div class=\"converter-row\">\n                    <div class=\"converter-group\">\n                        <div class=\"converter-label\">De:</div>\n                        <select id=\"fromCurrency\" onchange=\"updateConversion('currency')\">\n                            <option value=\"BRL\">Real (BRL)</option>\n                            <option value=\"USD\">Dólar (USD)</option>\n                            <option value=\"EUR\">Euro (EUR)</option>\n                            <option value=\"GBP\">Libra (GBP)</option>\n                            <option value=\"JPY\">Iene (JPY)</option>\n                        </select>\n                    </div>\n                    <div class=\"converter-group\">\n                        <div class=\"converter-label\">Para:</div>\n                        <select id=\"toCurrency\" onchange=\"updateConversion('currency')\">\n                            <option value=\"USD\">Dólar (USD)</option>\n                            <option value=\"BRL\">Real (BRL)</option>\n                            <option value=\"EUR\">Euro (EUR)</option>\n                            <option value=\"GBP\">Libra (GBP)</option>\n                            <option value=\"JPY\">Iene (JPY)</option>\n                        </select>\n                    </div>\n                </div>\n                <div class=\"converter-row\">\n                    <div class=\"converter-group\">\n                        <div class=\"converter-label\">Valor:</div>\n                        <input type=\"number\" id=\"currencyAmount\" value=\"1\" onchange=\"updateConversion('currency')\">\n                    </div>\n                    <div class=\"converter-group\">\n                        <div class=\"converter-label\">Resultado:</div>\n                        <input type=\"text\" id=\"currencyResult\" readonly>\n                    </div>\n                </div>\n                <div class=\"converter-row\">\n                    <div class=\"converter-label\">Taxa de câmbio:</div>\n                    <input type=\"number\" id=\"exchangeRate\" step=\"0.01\" placeholder=\"Taxa personalizada\" onchange=\"saveExchangeRate()\">\n                </div>\n            </div>\n\n            <div id=\"lengthConverter\" class=\"converter-container\" style=\"display: none;\">\n                <div class=\"converter-row\">\n                    <div class=\"converter-group\">\n                        <div class=\"converter-label\">De:</div>\n                        <select id=\"fromLength\" onchange=\"updateConversion('length')\">\n                            <option value=\"m\">Metro (m)</option>\n                            <option value=\"km\">Quilômetro (km)</option>\n                            <option value=\"cm\">Centímetro (cm)</option>\n                            <option value=\"mm\">Milímetro (mm)</option>\n                            <option value=\"ft\">Pé (ft)</option>\n                            <option value=\"in\">Polegada (in)</option>\n                        </select>\n                    </div>\n                    <div class=\"converter-group\">\n                        <div class=\"converter-label\">Para:</div>\n                        <select id=\"toLength\" onchange=\"updateConversion('length')\">\n                            <option value=\"cm\">Centímetro (cm)</option>\n                            <option value=\"m\">Metro (m)</option>\n                            <option value=\"km\">Quilômetro (km)</option>\n                            <option value=\"mm\">Milímetro (mm)</option>\n                            <option value=\"ft\">Pé (ft)</option>\n                            <option value=\"in\">Polegada (in)</option>\n                        </select>\n                    </div>\n                </div>\n                <div class=\"converter-row\">\n                    <div class=\"converter-group\">\n                        <div class=\"converter-label\">Valor:</div>\n                        <input type=\"number\" id=\"lengthAmount\" value=\"1\" onchange=\"updateConversion('length')\">\n                    </div>\n                    <div class=\"converter-group\">\n                        <div class=\"converter-label\">Resultado:</div>\n                        <input type=\"text\" id=\"lengthResult\" readonly>\n                    </div>\n                </div>\n            </div>\n\n            <div id=\"weightConverter\" class=\"converter-container\" style=\"display: none;\">\n                <div class=\"converter-row\">\n                    <div class=\"converter-group\">\n                        <div class=\"converter-label\">De:</div>\n                        <select id=\"fromWeight\" onchange=\"updateConversion('weight')\">\n                            <option value=\"kg\">Quilograma (kg)</option>\n                            <option value=\"g\">Grama (g)</option>\n                            <option value=\"lb\">Libra (lb)</option>\n                            <option value=\"oz\">Onça (oz)</option>\n                        </select>\n                    </div>\n                    <div class=\"converter-group\">\n                        <div class=\"converter-label\">Para:</div>\n                        <select id=\"toWeight\" onchange=\"updateConversion('weight')\">\n                            <option value=\"g\">Grama (g)</option>\n                            <option value=\"kg\">Quilograma (kg)</option>\n                            <option value=\"lb\">Libra (lb)</option>\n                            <option value=\"oz\">Onça (oz)</option>\n                        </select>\n                    </div>\n                </div>\n                <div class=\"converter-row\">\n                    <div class=\"converter-group\">\n                        <div class=\"converter-label\">Valor:</div>\n                        <input type=\"number\" id=\"weightAmount\" value=\"1\" onchange=\"updateConversion('weight')\">\n                    </div>\n                    <div class=\"converter-group\">\n                        <div class=\"converter-label\">Resultado:</div>\n                        <input type=\"text\" id=\"weightResult\" readonly>\n                    </div>\n                </div>\n            </div>\n\n            <div id=\"temperatureConverter\" class=\"converter-container\" style=\"display: none;\">\n                <div class=\"converter-row\">\n                    <div class=\"converter-group\">\n                        <div class=\"converter-label\">De:</div>\n                        <select id=\"fromTemperature\" onchange=\"updateConversion('temperature')\">\n                            <option value=\"C\">Celsius (°C)</option>\n                            <option value=\"F\">Fahrenheit (°F)</option>\n                            <option value=\"K\">Kelvin (K)</option>\n                        </select>\n                    </div>\n                    <div class=\"converter-group\">\n                        <div class=\"converter-label\">Para:</div>\n                        <select id=\"toTemperature\" onchange=\"updateConversion('temperature')\">\n                            <option value=\"F\">Fahrenheit (°F)</option>\n                            <option value=\"C\">Celsius (°C)</option>\n                            <option value=\"K\">Kelvin (K)</option>\n                        </select>\n                    </div>\n                </div>\n                <div class=\"converter-row\">\n                    <div class=\"converter-group\">\n                        <div class=\"converter-label\">Valor:</div>\n                        <input type=\"number\" id=\"temperatureAmount\" value=\"0\" onchange=\"updateConversion('temperature')\">\n                    </div>\n                    <div class=\"converter-group\">\n                        <div class=\"converter-label\">Resultado:</div>\n                        <input type=\"text\" id=\"temperatureResult\" readonly>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n\n    <script>\n        // Calculadora\n        let display = document.getElementById('display');\n        let currentExpression = '0';\n        let lastResult = 0;\n        let percentMode = false;\n\n        function updateDisplay() {\n            display.textContent = currentExpression;\n        }\n\n        function appendCharacter(char) {\n            if (currentExpression === '0' && char !== '.') {\n                currentExpression = char;\n            } else {\n                currentExpression += char;\n            }\n            updateDisplay();\n        }\n\n        function clearDisplay() {\n            currentExpression = '0';\n            updateDisplay();\n        }\n\n        function backspace() {\n            if (currentExpression.length <= 1) {\n                currentExpression = '0';\n            } else {\n                currentExpression = currentExpression.slice(0, -1);\n            }\n            updateDisplay();\n        }\n\n        function calculate() {\n            try {\n                // Substituir × por * para cálculo\n                let expressionToEval = currentExpression.replace(/×/g, '*');\n                lastResult = eval(expressionToEval);\n                currentExpression = lastResult.toString();\n                updateDisplay();\n            } catch (error) {\n                currentExpression = 'Erro';\n                updateDisplay();\n                setTimeout(clearDisplay, 1000);\n            }\n        }\n\n        function calculatePercentage() {\n            try {\n                // Verificar se já tem uma expressão em andamento\n                if (currentExpression.includes('+') || \n                    currentExpression.includes('-') || \n                    currentExpression.includes('*') || \n                    currentExpression.includes('/')) {\n                    \n                    // Encontrar o último operador\n                    let lastOpIndex = Math.max(\n                        currentExpression.lastIndexOf('+'),\n                        currentExpression.lastIndexOf('-'),\n                        currentExpression.lastIndexOf('*'),\n                        currentExpression.lastIndexOf('/')\n                    );\n                    \n                    if (lastOpIndex >= 0) {\n                        let operator = currentExpression[lastOpIndex];\n                        let baseNumber = parseFloat(currentExpression.substring(0, lastOpIndex));\n                        let percentage = parseFloat(currentExpression.substring(lastOpIndex + 1)) / 100;\n                        \n                        // Calcular o resultado dependendo do operador\n                        let result;\n                        if (operator === '+') {\n                            result = baseNumber + (baseNumber * percentage);\n                        } else if (operator === '-') {\n                            result = baseNumber - (baseNumber * percentage);\n                        } else if (operator === '*') {\n                            result = baseNumber * percentage;\n                        } else if (operator === '/') {\n                            result = baseNumber / percentage;\n                        }\n                        \n                        currentExpression = result.toString();\n                        updateDisplay();\n                    }\n                } else {\n                    // Se não há operador, apenas calcular a porcentagem\n                    let value = parseFloat(currentExpression) / 100;\n                    currentExpression = value.toString();\n                    updateDisplay();\n                }\n            } catch (error) {\n                currentExpression = 'Erro';\n                updateDisplay();\n                setTimeout(clearDisplay, 1000);\n            }\n        }\n\n        // Navegação por abas\n        function switchTab(tabId) {\n            document.querySelectorAll('.tab-content').forEach(tab => {\n                tab.classList.remove('active');\n            });\n            document.querySelectorAll('.tab').forEach(tab => {\n                tab.classList.remove('active');\n            });\n            \n            document.getElementById(tabId).classList.add('active');\n            document.querySelector(`.tab[onclick=\"switchTab('${tabId}')\"]`).classList.add('active');\n            \n            // Inicializar conversão se estiver mudando para o conversor\n            if (tabId === 'converter') {\n                const currentType = document.getElementById('converterType').value;\n                updateConversion(currentType);\n            }\n        }\n\n        // Funções do conversor\n        function switchConverter() {\n            const converterType = document.getElementById('converterType').value;\n            \n            // Esconder todos os conversores\n            document.querySelectorAll('.converter-container').forEach(container => {\n                container.style.display = 'none';\n            });\n            \n            // Mostrar o conversor selecionado\n            document.getElementById(`${converterType}Converter`).style.display = 'block';\n            \n            // Atualizar a conversão\n            updateConversion(converterType);\n        }\n\n        // Conversão de moedas\n        const exchangeRates = {\n            'USD': { 'BRL': 5.64, 'EUR': 0.92, 'GBP': 0.79, 'JPY': 110.23, 'USD': 1 },\n            'BRL': { 'USD': 0.18, 'EUR': 0.16, 'GBP': 0.14, 'JPY': 19.54, 'BRL': 1 },\n            'EUR': { 'USD': 1.09, 'BRL': 6.15, 'GBP': 0.86, 'JPY': 120.18, 'EUR': 1 },\n            'GBP': { 'USD': 1.27, 'BRL': 7.14, 'EUR': 1.16, 'JPY': 139.74, 'GBP': 1 },\n            'JPY': { 'USD': 0.0091, 'BRL': 0.051, 'EUR': 0.0083, 'GBP': 0.0072, 'JPY': 1 }\n        };\n\n        // Fatores de conversão para comprimento\n        const lengthFactors = {\n            'm': { 'm': 1, 'km': 0.001, 'cm': 100, 'mm': 1000, 'ft': 3.28084, 'in': 39.3701 },\n            'km': { 'm': 1000, 'km': 1, 'cm': 100000, 'mm': 1000000, 'ft': 3280.84, 'in': 39370.1 },\n            'cm': { 'm': 0.01, 'km': 0.00001, 'cm': 1, 'mm': 10, 'ft': 0.0328084, 'in': 0.393701 },\n            'mm': { 'm': 0.001, 'km': 0.000001, 'cm': 0.1, 'mm': 1, 'ft': 0.00328084, 'in': 0.0393701 },\n            'ft': { 'm': 0.3048, 'km': 0.0003048, 'cm': 30.48, 'mm': 304.8, 'ft': 1, 'in': 12 },\n            'in': { 'm': 0.0254, 'km': 0.0000254, 'cm': 2.54, 'mm': 25.4, 'ft': 0.0833333, 'in': 1 }\n        };\n\n        // Fatores de conversão para peso\n        const weightFactors = {\n            'kg': { 'kg': 1, 'g': 1000, 'lb': 2.20462, 'oz': 35.274 },\n            'g': { 'kg': 0.001, 'g': 1, 'lb': 0.00220462, 'oz': 0.035274 },\n            'lb': { 'kg': 0.453592, 'g': 453.592, 'lb': 1, 'oz': 16 },\n            'oz': { 'kg': 0.0283495, 'g': 28.3495, 'lb': 0.0625, 'oz': 1 }\n        };\n\n        // Carregar valores salvos\n        function loadSavedValues() {\n            // Carregar as taxas de câmbio personalizadas\n            for (let fromCurr in exchangeRates) {\n                for (let toCurr in exchangeRates[fromCurr]) {\n                    const savedRate = localStorage.getItem(`exchangeRate_${fromCurr}_${toCurr}`);\n                    if (savedRate !== null) {\n                        exchangeRates[fromCurr][toCurr] = parseFloat(savedRate);\n                    }\n                }\n            }\n            \n            // Carregar as últimas seleções\n            const lastConverterType = localStorage.getItem('lastConverterType');\n            if (lastConverterType) {\n                document.getElementById('converterType').value = lastConverterType;\n            }\n            \n            // Carregar as últimas unidades selecionadas para cada conversor\n            const currencyTypes = ['from', 'to'];\n            const converterTypes = ['Currency', 'Length', 'Weight', 'Temperature'];\n            \n            converterTypes.forEach(type => {\n                currencyTypes.forEach(direction => {\n                    const savedValue = localStorage.getItem(`last${direction}${type}`);\n                    if (savedValue && document.getElementById(`${direction}${type}`)) {\n                        document.getElementById(`${direction}${type}`).value = savedValue;\n                    }\n                });\n                \n                const savedAmount = localStorage.getItem(`last${type}Amount`);\n                if (savedAmount && document.getElementById(`${type.toLowerCase()}Amount`)) {\n                    document.getElementById(`${type.toLowerCase()}Amount`).value = savedAmount;\n                }\n            });\n            \n            // Inicializar o conversor\n            switchConverter();\n        }\n\n        // Salvar taxa de câmbio personalizada\n        function saveExchangeRate() {\n            const rate = parseFloat(document.getElementById('exchangeRate').value);\n            if (!isNaN(rate) && rate > 0) {\n                const fromCurrency = document.getElementById('fromCurrency').value;\n                const toCurrency = document.getElementById('toCurrency').value;\n                \n                // Atualizar e salvar a taxa\n                exchangeRates[fromCurrency][toCurrency] = rate;\n                localStorage.setItem(`exchangeRate_${fromCurrency}_${toCurrency}`, rate);\n                \n                // Atualizar também a taxa inversa\n                const inverseRate = 1 / rate;\n                exchangeRates[toCurrency][fromCurrency] = inverseRate;\n                localStorage.setItem(`exchangeRate_${toCurrency}_${fromCurrency}`, inverseRate);\n                \n                // Atualizar a conversão\n                updateConversion('currency');\n            }\n        }\n\n        // Função para atualizar o campo de taxa de câmbio exibido\n        function updateExchangeRateField() {\n            const fromCurrency = document.getElementById('fromCurrency').value;\n            const toCurrency = document.getElementById('toCurrency').value;\n            document.getElementById('exchangeRate').value = exchangeRates[fromCurrency][toCurrency];\n        }\n\n        // Funções de conversão\n        function updateConversion(type) {\n            switch(type) {\n                case 'currency':\n                    convertCurrency();\n                    break;\n                case 'length':\n                    convertLength();\n                    break;\n                case 'weight':\n                    convertWeight();\n                    break;\n                case 'temperature':\n                    convertTemperature();\n                    break;\n            }\n            \n            // Salvar as seleções atuais\n            localStorage.setItem('lastConverterType', type);\n        }\n\n        function convertCurrency() {\n            const fromCurrency = document.getElementById('fromCurrency').value;\n            const toCurrency = document.getElementById('toCurrency').value;\n            const amount = parseFloat(document.getElementById('currencyAmount').value);\n            \n            // Salvar as seleções\n            localStorage.setItem('lastfromCurrency', fromCurrency);\n            localStorage.setItem('lasttoCurrency', toCurrency);\n            localStorage.setItem('lastCurrencyAmount', amount);\n            \n            if (!isNaN(amount)) {\n                const rate = exchangeRates[fromCurrency][toCurrency];\n                const result = (amount * rate).toFixed(2);\n                document.getElementById('currencyResult').value = result;\n                updateExchangeRateField();\n            }\n        }\n\n        function convertLength() {\n            const fromUnit = document.getElementById('fromLength').value;\n            const toUnit = document.getElementById('toLength').value;\n            const amount = parseFloat(document.getElementById('lengthAmount').value);\n            \n            // Salvar as seleções\n            localStorage.setItem('lastfromLength', fromUnit);\n            localStorage.setItem('lasttoLength', toUnit);\n            localStorage.setItem('lastLengthAmount', amount);\n            \n            if (!isNaN(amount)) {\n                const factor = lengthFactors[fromUnit][toUnit];\n                const result = (amount * factor).toFixed(4);\n                document.getElementById('lengthResult').value = result;\n            }\n        }\n\n        function convertWeight() {\n            const fromUnit = document.getElementById('fromWeight').value;\n            const toUnit = document.getElementById('toWeight').value;\n            const amount = parseFloat(document.getElementById('weightAmount').value);\n            \n            // Salvar as seleções\n            localStorage.setItem('lastfromWeight', fromUnit);\n            localStorage.setItem('lasttoWeight', toUnit);\n            localStorage.setItem('lastWeightAmount', amount);\n            \n            if (!isNaN(amount)) {\n                const factor = weightFactors[fromUnit][toUnit];\n                const result = (amount * factor).toFixed(4);\n                document.getElementById('weightResult').value = result;\n            }\n        }\n\n        function convertTemperature() {\n            const fromUnit = document.getElementById('fromTemperature').value;\n            const toUnit = document.getElementById('toTemperature').value;\n            const amount = parseFloat(document.getElementById('temperatureAmount').value);\n            \n            // Salvar as seleções\n            localStorage.setItem('lastfromTemperature', fromUnit);\n            localStorage.setItem('lasttoTemperature', toUnit);\n            localStorage.setItem('lastTemperatureAmount', amount);\n            \n            if (!isNaN(amount)) {\n                let result;\n                \n                // Converter para Celsius primeiro\n                let tempInC;\n                if (fromUnit === 'C') tempInC = amount;\n                else if (fromUnit === 'F') tempInC = (amount - 32) * 5/9;\n                else if (fromUnit === 'K') tempInC = amount - 273.15;\n                \n                // Converter de Celsius para a unidade alvo\n                if (toUnit === 'C') result = tempInC;\n                else if (toUnit === 'F') result = tempInC * 9/5 + 32;\n                else if (toUnit === 'K') result = tempInC + 273.15;\n                \n                document.getElementById('temperatureResult').value = result.toFixed(2);\n            }\n        }\n\n        // Inicialização\n        window.onload = function() {\n            loadSavedValues();\n        };\n    </script>\n</body>\n</html>",
-            },
             {
                 id: 'todo-list',
                 title: 'Lista de Tarefas',
@@ -674,90 +604,126 @@ class ToolsManager {
     // Modificação para o construtor para inicializar a visibilidade dos controles
     constructor() {
         this.codeEditor = null;
-        this.tools = this.loadTools();
+        this.tools = [];
         this.currentToolId = null;
-        this.escKeyHandler = null; // Para armazenar o handler da tecla ESC
-        this.setupEventListeners();
-        this.renderToolsList();
-        this.setupSearchFunctionality();
+        this.escKeyHandler = null;
+        this.dbService = new ToolsDBService(); // Nova instância do serviço de DB
 
-        // Inicializa a visibilidade dos controles
-        this.updateToolControlsVisibility();
+        // Inicializa e carrega ferramentas de forma assíncrona
+        this.initTools().then(() => {
+            this.setupEventListeners();
+            this.renderToolsList();
+            this.setupSearchFunctionality();
+            this.updateToolControlsVisibility();
+        });
+    }
+    //método para inicializar ferramentas
+    async initTools() {
+        try {
+            this.tools = await this.loadTools();
+        } catch (error) {
+            console.error('Erro ao inicializar ferramentas:', error);
+            this.tools = [];
+        }
     }
 
     // Modifique o método loadTools na classe ToolsManager
-    loadTools() {
-        const storedTools = localStorage.getItem('html-tools');
-        if (storedTools) {
-            return JSON.parse(storedTools);
-        } else {
-            // Se não houver ferramentas salvas, carrega as ferramentas padrão
-            const defaultTools = this.getDefaultTools();
-            // Salva as ferramentas padrão para futuras sessões
-            localStorage.setItem('html-tools', JSON.stringify(defaultTools));
-            return defaultTools;
+    async loadTools() {
+        try {
+            // Tenta carregar do IndexedDB
+            const tools = await this.dbService.loadTools();
+
+            if (tools && tools.length > 0) {
+                return tools;
+            } else {
+                // Se não houver ferramentas no IndexedDB, verifica no localStorage para migração
+                const storedTools = localStorage.getItem('html-tools');
+
+                if (storedTools) {
+                    // Migra dados do localStorage para IndexedDB
+                    const parsedTools = JSON.parse(storedTools);
+                    await this.dbService.saveTools(parsedTools);
+                    // Limpa localStorage após migração
+                    localStorage.removeItem('html-tools');
+                    return parsedTools;
+                } else {
+                    // Se não há dados em nenhum lugar, carrega ferramentas padrão
+                    const defaultTools = this.getDefaultTools();
+                    await this.dbService.saveTools(defaultTools);
+                    return defaultTools;
+                }
+            }
+        } catch (error) {
+            console.error('Erro ao carregar ferramentas:', error);
+            // Em caso de erro, retorna ferramentas padrão
+            return this.getDefaultTools();
         }
     }
 
     // Salva as ferramentas no localStorage
-    saveTools() {
-        localStorage.setItem('html-tools', JSON.stringify(this.tools));
+    async saveTools() {
+        try {
+            await this.dbService.saveTools(this.tools);
+        } catch (error) {
+            console.error('Erro ao salvar ferramentas:', error);
+            // Fallback para localStorage em caso de erro
+            localStorage.setItem('html-tools', JSON.stringify(this.tools));
+        }
     }
 
     // Adiciona uma nova ferramenta
-    addTool(title, code) {
-        const newTool = {
-            id: Date.now().toString(),
-            title,
-            code,
-            createdAt: new Date().toISOString()
-        };
+    async addTool(title, code) {
+    const newTool = {
+        id: Date.now().toString(),
+        title,
+        code,
+        createdAt: new Date().toISOString()
+    };
 
-        this.tools.push(newTool);
-        this.saveTools();
-        this.renderToolsList();
-        return newTool;
-    }
+    this.tools.push(newTool);
+    await this.saveTools();
+    this.renderToolsList();
+    return newTool;
+}
 
     // Atualiza uma ferramenta existente
-    updateTool(id, title, code) {
-        const toolIndex = this.tools.findIndex(tool => tool.id === id);
-        if (toolIndex !== -1) {
-            this.tools[toolIndex] = {
-                ...this.tools[toolIndex],
-                title,
-                code,
-                updatedAt: new Date().toISOString()
-            };
-            this.saveTools();
-            this.renderToolsList();
-            if (this.currentToolId === id) {
-                this.displayTool(id);
-            }
+    async updateTool(id, title, code) {
+    const toolIndex = this.tools.findIndex(tool => tool.id === id);
+    if (toolIndex !== -1) {
+        this.tools[toolIndex] = {
+            ...this.tools[toolIndex],
+            title,
+            code,
+            updatedAt: new Date().toISOString()
+        };
+        await this.saveTools();
+        this.renderToolsList();
+        if (this.currentToolId === id) {
+            this.displayTool(id);
         }
     }
+}
 
     // Remove uma ferramenta
-    // Versão modificada do método deleteTool
-    deleteTool(id) {
-        this.tools = this.tools.filter(tool => tool.id !== id);
-        this.saveTools();
+    async deleteTool(id) {
+    this.tools = this.tools.filter(tool => tool.id !== id);
+    await this.saveTools();
 
-        // Resetar currentToolId se a ferramenta atual foi excluída
-        if (this.currentToolId === id) {
-            this.currentToolId = null;
+    // Resetar currentToolId se a ferramenta atual foi excluída
+    if (this.currentToolId === id) {
+        this.currentToolId = null;
 
-            // Atualiza a interface para mostrar a mensagem de boas-vindas
-            document.getElementById('welcome-message').style.display = 'block';
-            document.getElementById('tool-view').style.display = 'none';
+        // Atualiza a interface para mostrar a mensagem de boas-vindas
+        document.getElementById('welcome-message').style.display = 'block';
+        document.getElementById('tool-view').style.display = 'none';
 
-            // Atualiza a visibilidade dos controles
-            this.updateToolControlsVisibility();
-        }
-
-        // Renderiza a lista de ferramentas APÓS alterar o estado
-        this.renderToolsList();
+        // Atualiza a visibilidade dos controles
+        this.updateToolControlsVisibility();
     }
+
+    // Renderiza a lista de ferramentas APÓS alterar o estado
+    this.renderToolsList();
+}
 
     // Função melhorada para busca de ferramentas
     searchTools(query) {
@@ -1107,45 +1073,45 @@ class ToolsManager {
     }
 
     // Configura a funcionalidade de busca
-setupSearchFunctionality() {
-    const searchInput = document.getElementById('search-input');
-    const searchBtn = document.getElementById('search-btn');
-    const clearBtn = document.getElementById('clear-search-btn');
+    setupSearchFunctionality() {
+        const searchInput = document.getElementById('search-input');
+        const searchBtn = document.getElementById('search-btn');
+        const clearBtn = document.getElementById('clear-search-btn');
 
-    // Busca ao clicar no botão
-    searchBtn.addEventListener('click', () => {
-        this.searchTools(searchInput.value);
-    });
-
-    // Busca ao pressionar Enter
-    searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
+        // Busca ao clicar no botão
+        searchBtn.addEventListener('click', () => {
             this.searchTools(searchInput.value);
-        }
-    });
+        });
 
-    // Busca em tempo real ao digitar
-    searchInput.addEventListener('input', () => {
-        const value = searchInput.value;
-        this.searchTools(value);
+        // Busca ao pressionar Enter
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                this.searchTools(searchInput.value);
+            }
+        });
 
-        // Mostrar ou ocultar o botão de limpar
-        clearBtn.style.display = value.trim() !== '' ? 'inline-block' : 'none';
-    });
+        // Busca em tempo real ao digitar
+        searchInput.addEventListener('input', () => {
+            const value = searchInput.value;
+            this.searchTools(value);
 
-    // Limpar o campo de busca
-    clearBtn.addEventListener('click', () => {
-        searchInput.value = '';
-        clearBtn.style.display = 'none';
-        searchInput.focus();
-        this.searchTools(''); // Executa busca com string vazia
-    });
-}
+            // Mostrar ou ocultar o botão de limpar
+            clearBtn.style.display = value.trim() !== '' ? 'inline-block' : 'none';
+        });
+
+        // Limpar o campo de busca
+        clearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            clearBtn.style.display = 'none';
+            searchInput.focus();
+            this.searchTools(''); // Executa busca com string vazia
+        });
+    }
 
 }
 
 
 // Inicializa o gerenciador de ferramentas quando a página carregar
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     window.toolsManager = new ToolsManager();
 });

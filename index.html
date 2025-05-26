@@ -13,24 +13,28 @@
 <body>
     <header>
         <h1>Ferramentas HTML</h1>
-
+        
+        <div class="importarexportar">
+            <button id="export-btn" class="btn btn-primary">Exportar</button>
+            <button id="import-btn" class="btn btn-primary">Importar</button>
+            <button id="add-tool-btn" class="btn btn-success">Nova</button>
+        </div>
     </header>
-    <div class="acoes">
-        <button id="export-btn" class="btn btn-primary">Exportar</button>
-        <button id="import-btn" class="btn btn-primary">Importar</button>
-        <button id="add-tool-btn" class="btn btn-success">Nova</button>
-    </div>
 
 
     <div class="main-content">
         <div class="tools-list" id="tools-list">
             <h2>Ferramentas Disponíveis</h2>
             <div class="acoes">
-                <button class="respad" id="reset-defaults-btn">Restaurar Ferramentas Padrões</button>
-                <input class="pesquis" type="text" id="search-input" placeholder="Pesquisar ferramentas...">
-                <button id="search-btn">Buscar</button>
-                <button id="clear-search-btn" title="Limpar pesquisa" style="display: none;">Limpar</button>
+                <button class="btn" id="reset-defaults-btn">Restaurar Ferramentas Padrões</button>
+                <div class="input-group">
+                    <input class="input" type="text" id="search-input" placeholder="Pesquisar ferramentas...">
+                    <button class="btn" id="search-btn">Buscar</button>
+                    <button class="btn btn-clear" id="clear-search-btn" title="Limpar pesquisa"
+                        style="display: none;">Limpar</button>
+                </div>
             </div>
+
 
 
             <div id="tools-container">
