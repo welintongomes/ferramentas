@@ -125,21 +125,21 @@ class ToolsManager {
     }
     // Método para resetar para as ferramentas padrão
     async resetToDefaultTools() {
-    if (confirm('Isso irá substituir todas as suas ferramentas pelas ferramentas padrão. Deseja continuar?')) {
-        const defaultTools = this.getDefaultTools();
-        this.tools = [...defaultTools];
-        await this.saveTools();
-        this.renderToolsList();
+        if (confirm('Isso irá substituir todas as suas ferramentas pelas ferramentas padrão. Deseja continuar?')) {
+            const defaultTools = this.getDefaultTools();
+            this.tools = [...defaultTools];
+            await this.saveTools();
+            this.renderToolsList();
 
-        // Reset da ferramenta atual
-        this.currentToolId = null;
-        document.getElementById('welcome-message').style.display = 'block';
-        document.getElementById('tool-view').style.display = 'none';
-        this.updateToolControlsVisibility();
+            // Reset da ferramenta atual
+            this.currentToolId = null;
+            document.getElementById('welcome-message').style.display = 'block';
+            document.getElementById('tool-view').style.display = 'none';
+            this.updateToolControlsVisibility();
 
-        alert('Ferramentas redefinidas para o padrão com sucesso!');
+            alert('Ferramentas redefinidas para o padrão com sucesso!');
+        }
     }
-}
     // Adicione este método à classe ToolsManager
     getDefaultTools() {
         // Retorna um array com ferramentas predefinidas
@@ -513,7 +513,7 @@ class ToolsManager {
 
     // 4. Modifique o método toggleFullscreen para adicionar suporte à tecla ESC
     toggleFullscreen() {
-        const mainContent = document.querySelector('.main-content');
+        const mainContent = document.querySelector('.main-contentF');
         const sidebar = document.querySelector('.sidebar');
         const toolHeader = document.querySelector('.tool-header');
         const appHeader = document.querySelector('.app-header');
@@ -673,57 +673,57 @@ class ToolsManager {
 
     // Adiciona uma nova ferramenta
     async addTool(title, code) {
-    const newTool = {
-        id: Date.now().toString(),
-        title,
-        code,
-        createdAt: new Date().toISOString()
-    };
+        const newTool = {
+            id: Date.now().toString(),
+            title,
+            code,
+            createdAt: new Date().toISOString()
+        };
 
-    this.tools.push(newTool);
-    await this.saveTools();
-    this.renderToolsList();
-    return newTool;
-}
+        this.tools.push(newTool);
+        await this.saveTools();
+        this.renderToolsList();
+        return newTool;
+    }
 
     // Atualiza uma ferramenta existente
     async updateTool(id, title, code) {
-    const toolIndex = this.tools.findIndex(tool => tool.id === id);
-    if (toolIndex !== -1) {
-        this.tools[toolIndex] = {
-            ...this.tools[toolIndex],
-            title,
-            code,
-            updatedAt: new Date().toISOString()
-        };
-        await this.saveTools();
-        this.renderToolsList();
-        if (this.currentToolId === id) {
-            this.displayTool(id);
+        const toolIndex = this.tools.findIndex(tool => tool.id === id);
+        if (toolIndex !== -1) {
+            this.tools[toolIndex] = {
+                ...this.tools[toolIndex],
+                title,
+                code,
+                updatedAt: new Date().toISOString()
+            };
+            await this.saveTools();
+            this.renderToolsList();
+            if (this.currentToolId === id) {
+                this.displayTool(id);
+            }
         }
     }
-}
 
     // Remove uma ferramenta
     async deleteTool(id) {
-    this.tools = this.tools.filter(tool => tool.id !== id);
-    await this.saveTools();
+        this.tools = this.tools.filter(tool => tool.id !== id);
+        await this.saveTools();
 
-    // Resetar currentToolId se a ferramenta atual foi excluída
-    if (this.currentToolId === id) {
-        this.currentToolId = null;
+        // Resetar currentToolId se a ferramenta atual foi excluída
+        if (this.currentToolId === id) {
+            this.currentToolId = null;
 
-        // Atualiza a interface para mostrar a mensagem de boas-vindas
-        document.getElementById('welcome-message').style.display = 'block';
-        document.getElementById('tool-view').style.display = 'none';
+            // Atualiza a interface para mostrar a mensagem de boas-vindas
+            document.getElementById('welcome-message').style.display = 'block';
+            document.getElementById('tool-view').style.display = 'none';
 
-        // Atualiza a visibilidade dos controles
-        this.updateToolControlsVisibility();
+            // Atualiza a visibilidade dos controles
+            this.updateToolControlsVisibility();
+        }
+
+        // Renderiza a lista de ferramentas APÓS alterar o estado
+        this.renderToolsList();
     }
-
-    // Renderiza a lista de ferramentas APÓS alterar o estado
-    this.renderToolsList();
-}
 
     // Função melhorada para busca de ferramentas
     searchTools(query) {
@@ -962,11 +962,13 @@ class ToolsManager {
         // Botão para adicionar nova ferramenta
         document.getElementById('add-tool-btn').addEventListener('click', () => {
             this.openAddToolModal();
+            initCodeEditor();
         });
 
         // Botão de boas-vindas para adicionar primeira ferramenta
         document.getElementById('welcome-add-btn').addEventListener('click', () => {
             this.openAddToolModal();
+            initCodeEditor();
         });
 
         // Botão para editar ferramenta
@@ -974,6 +976,7 @@ class ToolsManager {
             if (this.currentToolId) {
                 this.openEditToolModal(this.currentToolId);
             }
+            initCodeEditor();
         });
 
         // Botão para excluir ferramenta
@@ -1056,7 +1059,7 @@ class ToolsManager {
         // Modifique o handler da tecla ESC para priorizar a saída do modo tela cheia
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                const mainContent = document.querySelector('.main-content');
+                const mainContent = document.querySelector('.main-contentF');
                 const modalVisible = document.getElementById('tool-modal').style.display === 'flex';
 
                 // Se estiver em modo tela cheia, o handler específico cuidará disso
@@ -1115,3 +1118,223 @@ class ToolsManager {
 document.addEventListener('DOMContentLoaded', async () => {
     window.toolsManager = new ToolsManager();
 });
+// Variável global para o editor
+let codeEditor = null;
+
+// Classe do editor de código
+class CodeEditor {
+    constructor() {
+        this.textarea = document.getElementById('input-code');
+        this.searchInput = document.getElementById('code-search-input');
+        this.searchBtn = document.getElementById('code-search-btn');
+        this.prevBtn = document.getElementById('code-prev-btn');
+        this.nextBtn = document.getElementById('code-next-btn');
+        this.searchResults = document.getElementById('code-search-results');
+        this.charCount = document.getElementById('code-char-count');
+        this.lineCount = document.getElementById('code-line-count');
+
+        this.currentMatches = [];
+        this.currentMatchIndex = -1;
+        this.lastSearch = '';
+
+        this.init();
+    }
+
+    init() {
+        if (!this.textarea) return;
+
+        this.searchBtn?.addEventListener('click', () => this.performSearch());
+        this.searchInput?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.performSearch();
+            }
+        });
+        this.searchInput?.addEventListener('input', () => {
+            if (this.searchInput.value === '') {
+                this.clearSearch();
+            }
+        });
+
+        this.prevBtn?.addEventListener('click', () => this.navigateSearch(-1));
+        this.nextBtn?.addEventListener('click', () => this.navigateSearch(1));
+
+        // ADICIONE este novo event listener para busca em tempo real:
+        // this.searchInput?.addEventListener('input', (e) => {
+        //     if (e.target.value.trim() && e.target.value.length > 2) {
+        //         // Busca automaticamente após 3 caracteres
+        //         clearTimeout(this.searchTimeout);
+        //         this.searchTimeout = setTimeout(() => {
+        //             this.performSearch();
+        //         }, 300);
+        //     } else if (e.target.value === '') {
+        //         this.clearSearch();
+        //     }
+        // });
+
+        this.textarea.addEventListener('input', () => {
+            this.updateStats();
+            if (this.lastSearch) {
+                this.performSearch();
+            }
+        });
+
+        this.textarea.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'f') {
+                e.preventDefault();
+                this.searchInput?.focus();
+                this.searchInput?.select();
+            }
+                    // ADICIONE navegação com F3/Shift+F3
+        if (e.key === 'F3') {
+            e.preventDefault();
+            if (e.shiftKey) {
+                this.navigateSearch(-1);
+            } else {
+                this.navigateSearch(1);
+            }
+        }
+
+
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = this.textarea.selectionStart;
+                const end = this.textarea.selectionEnd;
+
+                this.textarea.value = this.textarea.value.substring(0, start) +
+                    '    ' +
+                    this.textarea.value.substring(end);
+
+                this.textarea.selectionStart = this.textarea.selectionEnd = start + 4;
+            }
+        });
+
+        this.updateStats();
+    }
+
+    performSearch() {
+        const searchTerm = this.searchInput?.value.trim();
+        if (!searchTerm) {
+            this.clearSearch();
+            return;
+        }
+
+        this.lastSearch = searchTerm;
+        const content = this.textarea.value;
+        const searchLower = searchTerm.toLowerCase();
+        const contentLower = content.toLowerCase();
+
+        this.currentMatches = [];
+        let index = 0;
+
+        // Busca todas as ocorrências mantendo as posições originais
+        while ((index = contentLower.indexOf(searchLower, index)) !== -1) {
+            this.currentMatches.push({
+                start: index,
+                end: index + searchTerm.length,
+                text: content.substring(index, index + searchTerm.length)
+            });
+            index++;
+        }
+
+        if (this.currentMatches.length > 0) {
+            this.currentMatchIndex = 0;
+            this.highlightCurrentMatch();
+            if (this.searchResults) {
+                this.searchResults.textContent = `1 de ${this.currentMatches.length}`;
+                this.searchResults.className = '';
+            }
+        } else {
+            if (this.searchResults) {
+                this.searchResults.textContent = 'Nenhum resultado';
+                this.searchResults.className = 'search-no-results';
+            }
+        }
+    }
+
+    navigateSearch(direction) {
+        if (this.currentMatches.length === 0) return;
+
+        // Calcula o novo índice
+        let newIndex = this.currentMatchIndex + direction;
+
+        // Faz o wrap around (volta ao início/fim)
+        if (newIndex >= this.currentMatches.length) {
+            newIndex = 0;
+        } else if (newIndex < 0) {
+            newIndex = this.currentMatches.length - 1;
+        }
+
+        this.currentMatchIndex = newIndex;
+        this.highlightCurrentMatch();
+
+        if (this.searchResults) {
+            this.searchResults.textContent = `${this.currentMatchIndex + 1} de ${this.currentMatches.length}`;
+        }
+    }
+
+    highlightCurrentMatch() {
+        if (this.currentMatches.length === 0 || this.currentMatchIndex < 0) return;
+
+        const match = this.currentMatches[this.currentMatchIndex];
+
+        // Seleciona o texto encontrado
+        this.textarea.focus();
+        this.textarea.setSelectionRange(match.start, match.end);
+
+        // Calcula a posição para scroll
+        const textBeforeMatch = this.textarea.value.substring(0, match.start);
+        const linesBeforeMatch = textBeforeMatch.split('\n').length - 1;
+
+        // Calcula o scroll necessário
+        const textareaStyle = window.getComputedStyle(this.textarea);
+        const lineHeight = parseInt(textareaStyle.lineHeight) || 21;
+        const textareaHeight = this.textarea.clientHeight;
+        const linesVisible = Math.floor(textareaHeight / lineHeight);
+
+        // Posiciona o scroll para mostrar o resultado no centro da área visível
+        const targetScrollLine = Math.max(0, linesBeforeMatch - Math.floor(linesVisible / 2));
+        this.textarea.scrollTop = targetScrollLine * lineHeight;
+
+        // Força o foco no textarea para garantir que a seleção seja visível
+        setTimeout(() => {
+            this.textarea.focus();
+        }, 10);
+    }
+
+    // ADICIONE também esta função melhorada para limpar a busca:
+    clearSearch() {
+        this.currentMatches = [];
+        this.currentMatchIndex = -1;
+        this.lastSearch = '';
+        if (this.searchResults) {
+            this.searchResults.textContent = '';
+            this.searchResults.className = '';
+        }
+        // Remove qualquer seleção existente
+        if (this.textarea) {
+            this.textarea.setSelectionRange(0, 0);
+        }
+    }
+
+    updateStats() {
+        const content = this.textarea.value;
+        const charCount = content.length;
+        const lineCount = content.split('\n').length;
+
+        if (this.charCount) {
+            this.charCount.textContent = `${charCount} caracteres`;
+        }
+        if (this.lineCount) {
+            this.lineCount.textContent = `${lineCount} ${lineCount === 1 ? 'linha' : 'linhas'}`;
+        }
+    }
+}
+
+function initCodeEditor() {
+    setTimeout(() => {
+        if (!codeEditor) {
+            codeEditor = new CodeEditor();
+        }
+    }, 100);
+}

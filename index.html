@@ -11,8 +11,8 @@
 </head>
 
 <body>
-    <header>
-        <h1>Ferramentas HTML</h1>
+    <header class="headerF">
+        <h1 class="h1F">Ferramentas HTML</h1>
         
         <div class="importarexportar">
             <button id="export-btn" class="btn btn-primary">Exportar</button>
@@ -22,8 +22,8 @@
     </header>
 
 
-    <div class="main-content">
-        <div class="tools-list" id="tools-list">
+    <div class="main-contentF">
+        <div class="tools-listF" id="tools-listF">
             <h2>Ferramentas Disponíveis</h2>
             <div class="acoes">
                 <button class="btn" id="reset-defaults-btn">Restaurar Ferramentas Padrões</button>
@@ -46,7 +46,7 @@
             </div>
         </div>
 
-        <div class="tool-display" id="tool-display">
+        <div class="tool-displayF" id="tool-displayF">
             <div class="tool-header">
                 <h2 id="tool-title">Título da Ferramenta</h2>
             </div>
@@ -95,8 +95,24 @@
                         <input type="text" id="input-title" required placeholder="Ex: Calculadora, Tabuada, etc.">
                     </div>
                     <div class="form-group">
-                        <label for="input-code">Código HTML/CSS/JS</label>
-                        <textarea id="input-code" required placeholder="<!DOCTYPE html>
+    <label for="input-code">Código HTML/CSS/JS</label>
+    <div class="code-editor-container">
+        <div class="code-editor-toolbar">
+            <div class="search-container">
+                <input type="text" class="search-input" id="code-search-input" placeholder="Buscar no código...">
+                <button type="button" class="search-btn" id="code-search-btn">Buscar</button>
+                <div class="search-controls">
+                    <button type="button" class="search-btn" id="code-prev-btn" title="Anterior">↑</button>
+                    <button type="button" class="search-btn" id="code-next-btn" title="Próximo">↓</button>
+                    <span id="code-search-results"></span>
+                </div>
+            </div>
+            <div class="editor-stats">
+                <span id="code-char-count">0 caracteres</span> | 
+                <span id="code-line-count">1 linha</span>
+            </div>
+        </div>
+        <textarea class="code-editor" id="input-code" required placeholder="<!DOCTYPE html>
 <html>
 <head>
     <style>
@@ -111,7 +127,8 @@
     </script>
 </body>
 </html>"></textarea>
-                    </div>
+    </div>
+</div>
                     <button type="submit" class="btn btn-success" id="save-tool-btn">Salvar Ferramenta</button>
                 </form>
             </div>
