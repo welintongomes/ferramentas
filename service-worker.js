@@ -8,7 +8,8 @@ const urlsToCache = [
     './icon-512x512.png',
     './icon-192x192.png',
     './bootstrap.bundle.min.js',
-    './bootstrap.min.css'
+    './bootstrap.min.css',
+    './crypto-js.min.js'
     
     // Adicione outros arquivos que devem ser armazenados em cache, como imagens
 ];
