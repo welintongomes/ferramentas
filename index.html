@@ -13,7 +13,7 @@
 <body>
     <header class="headerF">
         <h1 class="h1F">Ferramentas HTML</h1>
-        
+
         <div class="importarexportar">
             <button id="export-btn" class="btn btn-primary">Exportar</button>
             <button id="import-btn" class="btn btn-primary">Importar</button>
@@ -47,13 +47,15 @@
         </div>
 
         <div class="tool-displayF" id="tool-displayF">
-            <div class="tool-header">
-                <h2 id="tool-title">Título da Ferramenta</h2>
-            </div>
-            <div class="tool-actions">
-                <button id="edit-tool-btn" class="btn btn-primary tool-control-btn">Editar</button>
-                <button id="delete-tool-btn" class="btn btn-danger tool-control-btn">Excluir</button>
-                <button id="fullscreen-btn" class="btn btn-primary tool-control-btn">Tela Cheia</button>
+            <div class="NNotaExpImp">
+                <div class="tool-header">
+                    <h2 id="tool-title">Título da Ferramenta</h2>
+                </div>
+                <div class="tool-actions">
+                    <button id="edit-tool-btn" class="btn btn-primary tool-control-btn">Editar</button>
+                    <button id="delete-tool-btn" class="btn btn-danger tool-control-btn">Excluir</button>
+                    <button id="fullscreen-btn" class="btn btn-primary tool-control-btn">Tela Cheia</button>
+                </div>
             </div>
             <div class="welcome-message" id="welcome-message">
                 <h2>Bem-vindo ao Hub de Ferramentas HTML</h2>
@@ -95,24 +97,27 @@
                         <input type="text" id="input-title" required placeholder="Ex: Calculadora, Tabuada, etc.">
                     </div>
                     <div class="form-group">
-    <label for="input-code">Código HTML/CSS/JS</label>
-    <div class="code-editor-container">
-        <div class="code-editor-toolbar">
-            <div class="search-container">
-                <input type="text" class="search-input" id="code-search-input" placeholder="Buscar no código...">
-                <button type="button" class="search-btn" id="code-search-btn">Buscar</button>
-                <div class="search-controls">
-                    <button type="button" class="search-btn" id="code-prev-btn" title="Anterior">↑</button>
-                    <button type="button" class="search-btn" id="code-next-btn" title="Próximo">↓</button>
-                    <span id="code-search-results"></span>
-                </div>
-            </div>
-            <div class="editor-stats">
-                <span id="code-char-count">0 caracteres</span> | 
-                <span id="code-line-count">1 linha</span>
-            </div>
-        </div>
-        <textarea class="code-editor" id="input-code" required placeholder="<!DOCTYPE html>
+                        <label for="input-code">Código HTML/CSS/JS</label>
+                        <div class="code-editor-container">
+                            <div class="code-editor-toolbar">
+                                <div class="search-container">
+                                    <input type="text" class="search-input" id="code-search-input"
+                                        placeholder="Buscar no código...">
+                                    <button type="button" class="search-btn" id="code-search-btn">Buscar</button>
+                                    <div class="search-controls">
+                                        <button type="button" class="search-btn" id="code-prev-btn"
+                                            title="Anterior">↑</button>
+                                        <button type="button" class="search-btn" id="code-next-btn"
+                                            title="Próximo">↓</button>
+                                        <span id="code-search-results"></span>
+                                    </div>
+                                </div>
+                                <div class="editor-stats">
+                                    <span id="code-char-count">0 caracteres</span> |
+                                    <span id="code-line-count">1 linha</span>
+                                </div>
+                            </div>
+                            <textarea class="code-editor" id="input-code" required placeholder="<!DOCTYPE html>
 <html>
 <head>
     <style>
@@ -127,8 +132,8 @@
     </script>
 </body>
 </html>"></textarea>
-    </div>
-</div>
+                        </div>
+                    </div>
                     <button type="submit" class="btn btn-success" id="save-tool-btn">Salvar Ferramenta</button>
                 </form>
             </div>

@@ -22,12 +22,15 @@
 }
 
 .headerF {
+    display: flex;
     border-radius: 0 0 12px 12px;
     background-color: #8834dbf5;
     color: white;
-    padding: 1rem;
+    padding: 0rem;
     text-align: center;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    justify-content: space-around;
+    align-items: center;
 }
 
 .h1F {
@@ -279,16 +282,6 @@
     color: #ddd;
 }
 
-@media (max-width: 768px) {
-    .main-contentF {
-        flex-direction: column;
-    }
-
-    .tool-displayF {
-        min-height: 400px;
-    }
-}
-
 /* Estilos para o modo tela cheia */
 .fullscreen-mode .tools-listF {
     display: none;
@@ -297,46 +290,6 @@
 .fullscreen-mode .tool-displayF {
     flex: 1;
     max-width: 100%;
-}
-
-/* Estilos para melhorar a responsividade */
-@media (max-width: 768px) {
-    #search-btn {
-        display: none;
-        order: 2;
-    }
-
-    #add-tool-btn {
-        order: 3;
-    }
-
-    #export-btn,
-    #import-btn {
-        flex: 1 0 calc(50% - 0.5rem);
-        order: 4;
-    }
-
-    .main-contentF {
-        flex-direction: column;
-    }
-
-    .tool-displayF {
-        padding: 0.1rem;
-        min-height: 70vh;
-    }
-
-    .tool-content {
-        height: 60vh;
-    }
-
-    .tool-actions {
-        flex-wrap: wrap;
-        gap: 0.25rem;
-    }
-
-    .tool-actions button {
-        flex: 1;
-    }
 }
 
 /* Estilos para o modo tela cheia */
@@ -420,7 +373,7 @@ h2 {
 }
 
 #tools-container {
-    max-height: 245px;
+    max-height: 325px;
     /* ou ajuste conforme seu layout */
     overflow-y: auto;
     padding: 1rem;
@@ -436,30 +389,6 @@ h2 {
     margin: 2px;
 }
 
-@media (min-width: 768px) {
-    .importarexportar {
-        text-align: center;
-    }
-}
-
-
-@media (max-width: 768px) {
-    .pesquis {
-        height: 23px;
-        width: 205px;
-    }
-
-    #tools-container {
-        margin-right: 34px;
-        margin-left: 34px;
-        max-height: 125px;
-        overflow-y: auto;
-        padding: 1rem;
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-}
 
 .acoes {
     flex-direction: column;
@@ -509,16 +438,6 @@ h2 {
 
 .btn-clear:hover {
     background-color: #a71d2a;
-}
-
-/* Responsivo para telas menores */
-@media (max-width: 600px) {
-    .acoes {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-
 }
 
 #search-btn {
@@ -611,7 +530,126 @@ h2 {
     font-size: 12px;
     margin-left: 8px;
 }
-#code-search-input{
+
+#code-search-input {
     height: 27px;
+
+}
+
+div.NNotaExpImp {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+/* Estilos para melhorar a responsividade */
+@media (max-width: 768px) {
+    #search-btn {
+        display: none;
+        order: 2;
+    }
+
+    #add-tool-btn {
+        order: 3;
+    }
+
+    #export-btn,
+    #import-btn {
+        flex: 1 0 calc(50% - 0.5rem);
+        order: 4;
+    }
+
+    .main-contentF {
+        flex-direction: column;
+    }
+
+    .tool-displayF {
+        padding: 0.1rem;
+        min-height: 70vh;
+    }
+
+    .tool-content {
+        height: 60vh;
+    }
+
+    .tool-actions {
+        flex-wrap: wrap;
+        gap: 0.25rem;
+    }
+
+    .tool-actions button {
+        flex: 1;
+    }
+
+    .pesquis {
+        height: 23px;
+        width: 205px;
+    }
+
+    #tools-container {
+        margin-right: 34px;
+        margin-left: 34px;
+        max-height: 125px;
+        overflow-y: auto;
+        padding: 1rem;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .main-contentF {
+        flex-direction: column;
+    }
+
+    .tool-displayF {
+        min-height: 400px;
+    }
+
+    .headerF {
+        border-radius: 0 0 12px 12px;
+        background-color: #8834dbf5;
+        color: white;
+        padding: 1rem;
+        text-align: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        justify-content: center;
+        align-content: center;
+        flex-wrap: nowrap;
+        flex-direction: column;
+    }
+
+    div.NNotaExpImp {
+    display: flex;
+    align-items: stretch;
+    flex-direction: column;
+}
+}
+
+@media (min-width: 768px) {
+    .importarexportar {
+        text-align: center;
+    }
+}
+
+/* Responsivo para telas menores */
+@media (max-width: 600px) {
+    .acoes {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .headerF {
+        border-radius: 0 0 12px 12px;
+        background-color: #8834dbf5;
+        color: white;
+        padding: 1rem;
+        text-align: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        justify-content: center;
+        align-content: center;
+        flex-wrap: nowrap;
+        flex-direction: column;
+    }
+
 
 }
