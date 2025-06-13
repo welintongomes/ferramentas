@@ -97,6 +97,13 @@ class ToolsDBService {
         });
     }
 }
+// Função auxiliar para remover acentos e padronizar para minúsculas
+function normalizeText(text) {
+    return text
+        .normalize("NFD") // separa os acentos
+        .replace(/[\u0300-\u036f]/g, "") // remove os acentos
+        .toLowerCase();
+}
 class ToolsManager {
     // 1. Adicione este método à classe ToolsManager para detectar duplo clique/toque
     handleDoubleClick() {
@@ -732,25 +739,25 @@ class ToolsManager {
             return;
         }
 
+        const normalizedQuery = normalizeText(query);
         // Quebra a consulta em termos individuais para busca mais precisa
-        const searchTerms = query.toLowerCase().split(' ').filter(term => term.length > 0);
+        const searchTerms = normalizedQuery.split(' ').filter(term => term.length > 0);
 
-        // Diferentes níveis de correspondência para ordenação por relevância
         const exactMatches = [];
         const startsWithMatches = [];
         const containsMatches = [];
 
         this.tools.forEach(tool => {
-            const title = tool.title.toLowerCase();
+            const normalizedTitle = normalizeText(tool.title);
 
-            // Verifica se todos os termos de busca estão presentes no título
-            const allTermsMatch = searchTerms.every(term => title.includes(term));
+            // Verifica se todos os termos estão no título, em qualquer ordem
+            const allTermsMatch = searchTerms.every(term => normalizedTitle.includes(term));
 
             if (allTermsMatch) {
-                // Determina o nível de correspondência para ordenação
-                if (title === query.toLowerCase()) {
+                // Relevância baseada no título completo normalizado
+                if (normalizedTitle === normalizedQuery) {
                     exactMatches.push(tool);
-                } else if (title.startsWith(searchTerms[0])) {
+                } else if (normalizedTitle.startsWith(searchTerms[0])) {
                     startsWithMatches.push(tool);
                 } else {
                     containsMatches.push(tool);
@@ -758,7 +765,6 @@ class ToolsManager {
             }
         });
 
-        // Combina os resultados em ordem de relevância
         const filteredTools = [...exactMatches, ...startsWithMatches, ...containsMatches];
 
         this.renderToolsList(filteredTools);
