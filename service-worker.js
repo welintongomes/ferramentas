@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meu-site-cache-v1';
+const CACHE_NAME = 'meu-site-cache-v1.1';
 const urlsToCache = [
     './', // Cacheia o arquivo HTML principal
     //'./bootstrap.min.css',
