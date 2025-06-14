@@ -1178,12 +1178,21 @@ class CodeEditor {
         //     }
         // });
 
-        this.textarea.addEventListener('input', () => {
-            this.updateStats();
-            if (this.lastSearch) {
-                this.performSearch();
-            }
-        });
+//versão corrigida erro foco ao buscar:
+this.textarea.addEventListener('input', () => {
+    this.updateStats();
+    // Limpa apenas os dados de busca, sem mover o cursor
+    if (this.lastSearch) {
+        this.currentMatches = [];
+        this.currentMatchIndex = -1;
+        this.lastSearch = '';
+        if (this.searchResults) {
+            this.searchResults.textContent = '';
+            this.searchResults.className = '';
+        }
+        // NÃO move o cursor - deixa onde o usuário estava editando
+    }
+});
 
         this.textarea.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.key === 'f') {
