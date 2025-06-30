@@ -174,14 +174,16 @@
 .form-group input,
 .form-group textarea {
     width: 100%;
-    padding: 0.75rem;
+    padding: 0.20rem;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 1rem;
 }
 
 .form-group textarea {
-    height: 200px;
+    padding: 0.35rem;
+    font-size: 12px;
+    height: 219px;
     font-family: monospace;
     resize: vertical;
 }
@@ -200,11 +202,12 @@
 }
 
 .modal-content {
+    height: 540px;
     background-color: white;
     border-radius: 8px;
-    width: 90%;
-    max-width: 800px;
-    padding: 1.5rem;
+    width: 95%;
+    max-width: 1000px;
+    padding: 0.4rem;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
@@ -212,8 +215,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
+    margin-bottom: 1px;
+    padding-bottom: 1px;
     border-bottom: 2px solid var(--light);
 }
 
@@ -231,7 +234,8 @@
 
 .tabs {
     display: flex;
-    margin-bottom: 1rem;
+    margin-top: 1px;
+    margin-bottom: 1px;
     border-bottom: 1px solid #ddd;
 }
 
@@ -461,7 +465,7 @@ h2 {
 
 .code-editor-toolbar {
     display: flex;
-    padding: 8px 12px;
+    padding: 0px 8px;
     background: #e9ecef;
     border-bottom: 1px solid #ddd;
     border-radius: 4px 4px 0 0;
