@@ -1165,7 +1165,7 @@ class CodeEditor {
         this.prevBtn?.addEventListener('click', () => this.navigateSearch(-1));
         this.nextBtn?.addEventListener('click', () => this.navigateSearch(1));
 
-        // ADICIONE este novo event listener para busca em tempo real:
+        // //ADICIONE este novo event listener para busca em tempo real:
         // this.searchInput?.addEventListener('input', (e) => {
         //     if (e.target.value.trim() && e.target.value.length > 2) {
         //         // Busca automaticamente após 3 caracteres
@@ -1178,21 +1178,21 @@ class CodeEditor {
         //     }
         // });
 
-//versão corrigida erro foco ao buscar:
-this.textarea.addEventListener('input', () => {
-    this.updateStats();
-    // Limpa apenas os dados de busca, sem mover o cursor
-    if (this.lastSearch) {
-        this.currentMatches = [];
-        this.currentMatchIndex = -1;
-        this.lastSearch = '';
-        if (this.searchResults) {
-            this.searchResults.textContent = '';
-            this.searchResults.className = '';
-        }
-        // NÃO move o cursor - deixa onde o usuário estava editando
-    }
-});
+        //versão corrigida erro foco ao buscar:
+        this.textarea.addEventListener('input', () => {
+            this.updateStats();
+            // Limpa apenas os dados de busca, sem mover o cursor
+            if (this.lastSearch) {
+                this.currentMatches = [];
+                this.currentMatchIndex = -1;
+                this.lastSearch = '';
+                if (this.searchResults) {
+                    this.searchResults.textContent = '';
+                    this.searchResults.className = '';
+                }
+                // NÃO move o cursor - deixa onde o usuário estava editando
+            }
+        });
 
         this.textarea.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.key === 'f') {
@@ -1200,15 +1200,15 @@ this.textarea.addEventListener('input', () => {
                 this.searchInput?.focus();
                 this.searchInput?.select();
             }
-                    // ADICIONE navegação com F3/Shift+F3
-        if (e.key === 'F3') {
-            e.preventDefault();
-            if (e.shiftKey) {
-                this.navigateSearch(-1);
-            } else {
-                this.navigateSearch(1);
+            // ADICIONE navegação com F3/Shift+F3
+            if (e.key === 'F3') {
+                e.preventDefault();
+                if (e.shiftKey) {
+                    this.navigateSearch(-1);
+                } else {
+                    this.navigateSearch(1);
+                }
             }
-        }
 
 
             if (e.key === 'Tab') {
@@ -1228,28 +1228,38 @@ this.textarea.addEventListener('input', () => {
     }
 
     performSearch() {
-        const searchTerm = this.searchInput?.value.trim();
-        if (!searchTerm) {
+        const rawInput = this.searchInput?.value;
+        if (!rawInput) {
             this.clearSearch();
             return;
         }
 
-        this.lastSearch = searchTerm;
+        this.lastSearch = rawInput;
+
         const content = this.textarea.value;
-        const searchLower = searchTerm.toLowerCase();
-        const contentLower = content.toLowerCase();
+
+        // Função para normalizar strings (sem acentos e lowercase)
+        const normalize = (str) =>
+            str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+        const normalizedContent = normalize(content);
+        const normalizedSearch = normalize(rawInput);
+
+        const escapedSearch = normalizedSearch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(escapedSearch, 'g');
 
         this.currentMatches = [];
-        let index = 0;
+        let match;
+        while ((match = regex.exec(normalizedContent)) !== null) {
+            // Mapear posição no texto original
+            const start = this.mapIndexToOriginal(content, normalizedContent, match.index);
+            const end = this.mapIndexToOriginal(content, normalizedContent, match.index + match[0].length);
 
-        // Busca todas as ocorrências mantendo as posições originais
-        while ((index = contentLower.indexOf(searchLower, index)) !== -1) {
             this.currentMatches.push({
-                start: index,
-                end: index + searchTerm.length,
-                text: content.substring(index, index + searchTerm.length)
+                start,
+                end,
+                text: content.substring(start, end)
             });
-            index++;
         }
 
         if (this.currentMatches.length > 0) {
@@ -1261,12 +1271,28 @@ this.textarea.addEventListener('input', () => {
             }
         } else {
             if (this.searchResults) {
-                this.searchResults.textContent = 'Nenhum resultado';
+                this.searchResults.textContent = '❌';
                 this.searchResults.className = 'search-no-results';
             }
         }
     }
+    //🔁 Função auxiliar: mapear posição entre texto normalizado e original auxilia busca no codigo
+    mapIndexToOriginal(original, _normalized, targetIndex) {
+        let originalIndex = 0;
+        let normalizedIndex = 0;
 
+        while (originalIndex < original.length && normalizedIndex < targetIndex) {
+            const char = original[originalIndex];
+            const normalizedChar = char.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+            normalizedIndex += normalizedChar.length;
+            originalIndex++;
+        }
+
+        return originalIndex;
+    }
+
+    
     navigateSearch(direction) {
         if (this.currentMatches.length === 0) return;
 

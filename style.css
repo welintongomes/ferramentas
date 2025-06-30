@@ -183,7 +183,7 @@
 .form-group textarea {
     padding: 0.35rem;
     font-size: 12px;
-    height: 219px;
+    height: 240px;
     font-family: monospace;
     resize: vertical;
 }
@@ -545,6 +545,16 @@ div.NNotaExpImp {
     justify-content: space-between;
     align-items: baseline;
 }
+
+#code-search-results {
+    writing-mode: horizontal-tb; /* Modo horizontal padrão */
+    text-orientation: initial;   /* Remove qualquer orientação de texto */
+    white-space: nowrap;         /* Evita quebra de linha */
+    transform: none;             /* Remove qualquer rotação */
+    display: inline-block;       /* Garante que fique no fluxo horizontal */
+    font-size: 13px;             /* Ajustável conforme necessário */
+}
+
 
 /* Estilos para melhorar a responsividade */
 @media (max-width: 768px) {
